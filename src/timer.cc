@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <omp.h>
 
 #include "agent.h"
 #include "error.h"
@@ -14,8 +15,8 @@
 namespace cyclus {
 
 void Timer::RunSim() {
-  CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << 0 << " to end=" << si_.duration;
+  CLOG(LEV_INFO1) << "Simulation set to run from start=" << 0
+                  << " to end=" << si_.duration;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
   ExchangeManager<Material> matl_manager(ctx_);
@@ -30,14 +31,20 @@ void Timer::RunSim() {
 
     // run through phases
     DoBuild();
-    CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
-    DoTick();
-    CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
-    DoResEx(&matl_manager, &genrsrc_manager);
-    CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
-    DoTock();
-    DoDecom();
-
+#pragma omp parallel
+    {
+      CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
+      DoTick();
+#pragma omp single
+      {
+        CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
+        DoResEx(&matl_manager, &genrsrc_manager);
+      }
+      CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
+      DoTock();
+    }
+#pragma omp single
+    { DoDecom(); }
 #ifdef CYCLUS_WITH_PYTHON
     EventLoop();
 #endif
@@ -51,10 +58,11 @@ void Timer::RunSim() {
 
   ctx_->NewDatum("Finish")
       ->AddVal("EarlyTerm", want_kill_)
-      ->AddVal("EndTime", time_-1)
+      ->AddVal("EndTime", time_ - 1)
       ->Record();
 
-  SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
+  SimInit::Snapshot(
+      ctx_);  // always do a snapshot at the end of every simulation
 }
 
 void Timer::DoBuild() {
@@ -75,6 +83,7 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
+#pragma omp for 
   for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
@@ -89,6 +98,7 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
+#pragma omp for 
   for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
        agent != tickers_.end();
        agent++) {
@@ -159,6 +169,7 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
 void Timer::DoDecom() {
   // decommission queued agents
   std::vector<Agent*> decom_list = decom_queue_[time_];
+#pragma omp for 
   for (int i = 0; i < decom_list.size(); ++i) {
     Agent* m = decom_list[i];
     if (m->parent() != NULL) {
