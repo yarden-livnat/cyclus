@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <set>
+#include <omp.h>
 
 #include "bid_portfolio.h"
 #include "context.h"
@@ -74,21 +75,29 @@ class ResourceExchange {
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     InitTraders();
-    std::for_each(
+#pragma omp parallel for
+    for( auto it = traders_.begin(); it != traders_.end(); it++){
+        AddRequests_(*it);
+    }
+    /*std::for_each(
         traders_.begin(),
         traders_.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
-                     this));
+                     this));*/
   }
 
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     InitTraders();
-    std::for_each(
+#pragma omp parallel for
+    for( auto it = traders_.begin(); it != traders_.end(); it++){
+        AddBids_(*it);
+    }
+   /* std::for_each(
         traders_.begin(),
         traders_.end(),
         std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
-                     this));
+                     this));*/
   }
 
   /// @brief adjust preferences for requests given bid responses
@@ -123,7 +132,8 @@ class ResourceExchange {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
     typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
     for (it = rp.begin(); it != rp.end(); ++it) {
-      ex_ctx_.AddRequestPortfolio(*it);
+#pragma omp parallel single
+      {ex_ctx_.AddRequestPortfolio(*it);}
     }
   }
 
@@ -133,7 +143,8 @@ class ResourceExchange {
         QueryBids<T>(t, ex_ctx_.commod_requests);
     typename std::set<typename BidPortfolio<T>::Ptr>::iterator it;
     for (it = bp.begin(); it != bp.end(); ++it) {
-      ex_ctx_.AddBidPortfolio(*it);
+#pragma omp parallel single
+      {ex_ctx_.AddBidPortfolio(*it);}
     }
   }
 
