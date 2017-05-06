@@ -109,6 +109,8 @@ void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
     t = time() + 1;
   }
   int pid = (parent != NULL) ? parent->id() : -1;
+#pragma omp critical(she)
+  {
   ti_->SchedBuild(parent, proto_name, t);
   NewDatum("BuildSchedule")
       ->AddVal("ParentId", pid)
@@ -117,17 +119,21 @@ void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
       ->AddVal("BuildTime", t)
       ->Record();
 }
+}
 
 void Context::SchedDecom(Agent* m, int t) {
   if (t == -1) {
     t = time();
   }
+#pragma omp critical(she)
+  {
   ti_->SchedDecom(m, t);
   NewDatum("DecomSchedule")
       ->AddVal("AgentId", m->id())
       ->AddVal("SchedTime", time())
       ->AddVal("DecomTime", t)
       ->Record();
+  }
 }
 
 boost::uuids::uuid Context::sim_id() {

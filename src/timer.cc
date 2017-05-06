@@ -31,20 +31,13 @@ void Timer::RunSim() {
 
     // run through phases
     DoBuild();
-#pragma omp parallel
-    {
-      CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
-      DoTick();
-#pragma omp single
-      {
-        CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
-        DoResEx(&matl_manager, &genrsrc_manager);
-      }
-      CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
-      DoTock();
-    }
-#pragma omp single
-    { DoDecom(); }
+    CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
+    DoTick();
+    CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
+    DoResEx(&matl_manager, &genrsrc_manager);
+    CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
+    DoTock();
+    DoDecom();
 #ifdef CYCLUS_WITH_PYTHON
     EventLoop();
 #endif
@@ -83,14 +76,15 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
-#pragma omp for 
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+  std::cout << "Dotick in" << std::endl;
+#pragma omp parallel for
+  for (int i = 0; i < tickers_.size(); i++) {
+    std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+    std::advance(agent, i);
     agent->second->Tick();
   }
+  std::cout << "Dotick out" << std::endl;
 }
-
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   matmgr->Execute();
@@ -98,26 +92,30 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-#pragma omp for 
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+  std::cout << "Dotock in" << std::endl;
+#pragma omp parallel for
+  for (int i = 0; i < tickers_.size(); i++) {
+    std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+    std::advance(agent, i);
     agent->second->Tock();
   }
-
-  if (si_.explicit_inventory || si_.explicit_inventory_compact) {
-    std::set<Agent*> ags = ctx_->agent_list_;
-    std::set<Agent*>::iterator it;
-    for (it = ags.begin(); it != ags.end(); ++it) {
-      Agent* a = *it;
-      if (a->enter_time() == -1) {
-        continue; // skip agents that aren't alive
+  std::cout << "Dotock mid" << std::endl;
+#pragma omp critical(record)
+  {
+    if (si_.explicit_inventory || si_.explicit_inventory_compact) {
+      std::set<Agent*> ags = ctx_->agent_list_;
+      std::set<Agent*>::iterator it;
+      for (it = ags.begin(); it != ags.end(); ++it) {
+        Agent* a = *it;
+        if (a->enter_time() == -1) {
+          continue;  // skip agents that aren't alive
+        }
+        RecordInventories(a);
       }
-      RecordInventories(a);
     }
   }
+  std::cout << "Dotock out" << std::endl;
 }
-
 
 void Timer::RecordInventories(Agent* a) {
   Inventories invs = a->SnapshotInv();
@@ -169,7 +167,6 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
 void Timer::DoDecom() {
   // decommission queued agents
   std::vector<Agent*> decom_list = decom_queue_[time_];
-#pragma omp for 
   for (int i = 0; i < decom_list.size(); ++i) {
     Agent* m = decom_list[i];
     if (m->parent() != NULL) {

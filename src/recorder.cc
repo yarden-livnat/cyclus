@@ -67,19 +67,22 @@ void Recorder::set_dump_count(unsigned int count) {
 }
 
 Datum* Recorder::NewDatum(std::string title) {
-  Datum* d = data_[index_];
-  d->title_ = title;
-  if (inject_sim_id_) {
-    d->vals_.resize(1);
-    d->shapes_.resize(1);
-    d->fields_.resize(1);
-  } else {
-    d->vals_.resize(0);
-    d->shapes_.resize(0);
-    d->fields_.resize(0);
+  Datum* d; 
+#pragma omp critical(recoder_newdatum)
+  {
+    d = data_[index_];
+    d->title_ = title;
+    if (inject_sim_id_) {
+      d->vals_.resize(1);
+      d->shapes_.resize(1);
+      d->fields_.resize(1);
+    } else {
+      d->vals_.resize(0);
+      d->shapes_.resize(0);
+      d->fields_.resize(0);
+    }
+    index_++;
   }
-
-  index_++;
   return d;
 }
 

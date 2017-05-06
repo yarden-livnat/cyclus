@@ -1,16 +1,16 @@
 #ifndef CYCLUS_SRC_RESOURCE_EXCHANGE_H_
 #define CYCLUS_SRC_RESOURCE_EXCHANGE_H_
 
+#include <omp.h>
 #include <algorithm>
 #include <functional>
 #include <set>
-#include <omp.h>
 
 #include "bid_portfolio.h"
 #include "context.h"
 #include "exchange_context.h"
-#include "product.h"
 #include "material.h"
+#include "product.h"
 #include "request_portfolio.h"
 #include "trader.h"
 #include "trader_management.h"
@@ -19,7 +19,7 @@ namespace cyclus {
 
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
-template<class T>
+template <class T>
 inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
 inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
@@ -58,48 +58,49 @@ inline static void AdjustPrefs(Trader* t, PrefMap<Product>::type& prefs) {
 /// exchng.AddAllBids();
 /// exchng.AdjustAll();
 /// @endcode
-template <class T>
-class ResourceExchange {
+template <class T> class ResourceExchange {
  public:
   /// @brief default constructor
   ///
   /// @param ctx the simulation context
-  ResourceExchange(Context* ctx) {
-    sim_ctx_ = ctx;
-  }
+  ResourceExchange(Context* ctx) { sim_ctx_ = ctx; }
 
-  inline ExchangeContext<T>& ex_ctx() {
-    return ex_ctx_;
-  }
+  inline ExchangeContext<T>& ex_ctx() { return ex_ctx_; }
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     InitTraders();
+    std::cout << "in request" << std::endl;
 #pragma omp parallel for
-    for( auto it = traders_.begin(); it != traders_.end(); it++){
-        AddRequests_(*it);
+    for (int i = 0; i < traders_.size(); i++) {
+      auto it = traders_.begin();
+      std::advance(it, i);
+      AddRequests_(*it);
+      /*std::for_each(
+          traders_.begin(),
+          traders_.end(),
+          std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
+                       this));*/
     }
-    /*std::for_each(
-        traders_.begin(),
-        traders_.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
-                     this));*/
+    std::cout << "out request" << std::endl;
   }
-
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     InitTraders();
+    std::cout << "in bid" << std::endl;
 #pragma omp parallel for
-    for( auto it = traders_.begin(); it != traders_.end(); it++){
-        AddBids_(*it);
+    for (int i = 0; i < traders_.size(); i++) {
+      auto it = traders_.begin();
+      std::advance(it, i);
+      AddBids_(*it);
+      /* std::for_each(
+           traders_.begin(),
+           traders_.end(),
+           std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
+                        this));*/
     }
-   /* std::for_each(
-        traders_.begin(),
-        traders_.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
-                     this));*/
+    std::cout << "out bid" << std::endl;
   }
-
   /// @brief adjust preferences for requests given bid responses
   void AdjustAll() {
     InitTraders();
@@ -107,9 +108,8 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(
-            std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs_),
-            this));
+        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs_),
+                     this));
   }
 
   /// return true if this is an empty exchange (i.e., no requests exist,
@@ -132,8 +132,8 @@ class ResourceExchange {
     std::set<typename RequestPortfolio<T>::Ptr> rp = QueryRequests<T>(t);
     typename std::set<typename RequestPortfolio<T>::Ptr>::iterator it;
     for (it = rp.begin(); it != rp.end(); ++it) {
-#pragma omp parallel single
-      {ex_ctx_.AddRequestPortfolio(*it);}
+#pragma omp critical(addrequest)
+      { ex_ctx_.AddRequestPortfolio(*it); }
     }
   }
 
@@ -143,8 +143,8 @@ class ResourceExchange {
         QueryBids<T>(t, ex_ctx_.commod_requests);
     typename std::set<typename BidPortfolio<T>::Ptr>::iterator it;
     for (it = bp.begin(); it != bp.end(); ++it) {
-#pragma omp parallel single
-      {ex_ctx_.AddBidPortfolio(*it);}
+#pragma omp critical(addbid)
+      { ex_ctx_.AddBidPortfolio(*it); }
     }
   }
 
