@@ -200,53 +200,21 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
    
     MESSAGE(" --   cmake_system_name: ${CMAKE_SYSTEM_NAME}")
-    IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      # also see how to do overrides:
-      # https://gist.github.com/robertmaynard/11297565
-
-      # updated for cuda 7, which uses libc++ rather than libstdc++
-      # older SETtings: check the git history
-      SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} 	 /opt/local/lib /opt/local/lib/libomp)
-      SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} 	 /opt/local/include /opt/local/include/libomp)
-
-      MESSAGE(" --   cmake_cxx_compiler_id: ${CMAKE_CXX_COMPILER_ID}")
-      IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-
-        #added for openmp on os x using macports
-        FIND_PATH(OPENMP_INCLUDE omp.h PATHS ${CMAKE_INCLUDE_PATH})
-        FIND_LIBRARY(OPENMP_LIB NAMES libgomp.dylib libomp.dylib libiomp5.dylib PATHS ${CMAKE_LIBRARY_PATH})
-        if (OPENMP_INCLUDE OR OPENMP_LIB)
-
-          LINK_DIRECTORIES("/opt/local/lib" "/opt/local/lib/libomp")
-          INCLUDE_DIRECTORIES("/opt/local/include" "/opt/local/include/libomp")
-
-          SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-          SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-          MESSAGE(STATUS "Found OpenMP (-libomp)")
-        else()
-          MESSAGE(WARNING "OpenMP (-libomp) was requested but support was not found")
-        endif(OPENMP_INCLUDE OR OPENMP_LIB)
-
-    ENDIF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-
-    ELSE()
-
-      #added for openmp on linux
-      FIND_PACKAGE(openmp)
-      IF(openmp_found)
-        SET(cmake_c_flags "${cmake_c_flags} ${openmp_c_flags}")
-        SET(cmake_cxx_flags "${cmake_cxx_flags} ${openmp_cxx_flags}")
-        MESSAGE(status "found openmp")
+      #added for OpenMP on Linux
+      FIND_PACKAGE(OpenMP)
+      IF(OPENMP_FOUND)
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        MESSAGE(STATUS "Found OpenMP")
       ELSE()
-        MESSAGE(warning "openmp was requested but support was not found")
+        MESSAGE(WARNING "OpenMP was requested but support was not found")
       ENDIF()
-  ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     
     
     # find lapack and link to it
-    FIND_PACKAGE(LAPACK REQUIRED)
-    set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
-    MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
+    #FIND_PACKAGE(LAPACK REQUIRED)
+    #set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
+    #MESSAGE("\tFound LAPACK Libraries: ${LAPACK_LIBRARIES}")
 
     # find coin and link to it
     FIND_PACKAGE(COIN REQUIRED)
