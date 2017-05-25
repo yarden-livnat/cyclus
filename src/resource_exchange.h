@@ -70,7 +70,7 @@ template <class T> class ResourceExchange {
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     InitTraders();
-    std::cout << "in request" << std::endl;
+    //std::cout << "in request" << std::endl;
 #pragma omp parallel for
     for (int i = 0; i < traders_.size(); i++) {
       auto it = traders_.begin();
@@ -82,12 +82,12 @@ template <class T> class ResourceExchange {
           std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
                        this));*/
     }
-    std::cout << "out request" << std::endl;
+    //std::cout << "out request" << std::endl;
   }
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     InitTraders();
-    std::cout << "in bid" << std::endl;
+    //std::cout << "in bid" << std::endl;
 #pragma omp parallel for
     for (int i = 0; i < traders_.size(); i++) {
       auto it = traders_.begin();
@@ -99,7 +99,7 @@ template <class T> class ResourceExchange {
            std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
                         this));*/
     }
-    std::cout << "out bid" << std::endl;
+    //std::cout << "out bid" << std::endl;
   }
   /// @brief adjust preferences for requests given bid responses
   void AdjustAll() {

@@ -76,14 +76,14 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
-  std::cout << "Dotick in" << std::endl;
+  //std::cout << "Dotick in" << std::endl;
 #pragma omp parallel for
   for (int i = 0; i < tickers_.size(); i++) {
     std::map<int, TimeListener*>::iterator agent = tickers_.begin();
     std::advance(agent, i);
     agent->second->Tick();
   }
-  std::cout << "Dotick out" << std::endl;
+  //std::cout << "Dotick out" << std::endl;
 }
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
@@ -92,14 +92,13 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  std::cout << "Dotock in" << std::endl;
-#pragma omp parallel for
+  //std::cout << "Dotock in" << std::endl;
   for (int i = 0; i < tickers_.size(); i++) {
     std::map<int, TimeListener*>::iterator agent = tickers_.begin();
     std::advance(agent, i);
     agent->second->Tock();
   }
-  std::cout << "Dotock mid" << std::endl;
+  //std::cout << "Dotock mid" << std::endl;
 #pragma omp critical(record)
   {
     if (si_.explicit_inventory || si_.explicit_inventory_compact) {
@@ -114,7 +113,7 @@ void Timer::DoTock() {
       }
     }
   }
-  std::cout << "Dotock out" << std::endl;
+  //std::cout << "Dotock out" << std::endl;
 }
 
 void Timer::RecordInventories(Agent* a) {
