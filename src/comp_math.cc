@@ -50,12 +50,11 @@ void ApplyThreshold(CompMap* v, double threshold) {
     throw ValueError(ss.str());
   }
 
-  CompMap::iterator it = v->begin();
-  while (it != v->end()) {
-    if (std::abs(it->second) <= threshold) {
-      v->erase(it++);
-    } else {
-      it++;
+  CompMap v_tmp = *v;
+  v->clear();
+  for (auto it = v_tmp.cbegin(); it != v_tmp.cend() ; it++) {
+    if (std::abs(it->second) > threshold) {
+      (*v)[it->first] = it->second;
     }
   }
 }
