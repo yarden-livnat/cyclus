@@ -49,7 +49,6 @@ class ExchangeTranslator {
     typename std::vector<typename RequestPortfolio<T>::Ptr>::const_iterator
         rp_it;
     for (rp_it = requests.begin(); rp_it != requests.end(); ++rp_it) {
-      std::cout << "translator cap: " << (*rp_it)->qty() << std::endl;
       CapacityConstraint<T> c((*rp_it)->qty(), (*rp_it)->qty_converter());
       (*rp_it)->AddConstraint(c);
 
