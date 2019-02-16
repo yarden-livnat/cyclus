@@ -219,7 +219,6 @@ SET_TARGET_PROPERTIES(cyclus
     INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
     )
-
 TARGET_LINK_LIBRARIES(cyclus dl ${LIBS})
 
 INSTALL(
@@ -228,7 +227,22 @@ INSTALL(
     COMPONENT cyclus
     )
 
+ADD_LIBRARY(cyclus_backend ${CYCLUS_CORE_SRC})
+SET_TARGET_PROPERTIES(cyclus_backend
+    PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+    )
+TARGET_LINK_LIBRARIES(cyclus_backend dl ${LIBS})
+
+INSTALL(
+    TARGETS cyclus_backend
+    LIBRARY DESTINATION lib
+    COMPONENT cyclus
+    )
+
 SET(LIBS ${LIBS} cyclus PARENT_SCOPE)
+SET(LIBS ${LIBS} cyclus_backend PARENT_SCOPE)
 #################################################################
 ######### end build libcyclus ###################################
 #################################################################
