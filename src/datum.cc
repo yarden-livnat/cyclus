@@ -2,8 +2,6 @@
 
 #include <boost/pool/singleton_pool.hpp>
 
-#include "timer.h"
-
 namespace cyclus {
 
 typedef boost::singleton_pool<Datum, sizeof(Datum)> DatumPool;

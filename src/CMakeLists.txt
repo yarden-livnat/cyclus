@@ -26,11 +26,6 @@ else(DEFINED DEFAULT_ALLOW_MILPS)
     endif("${COIN_VERSION}" VERSION_GREATER_EQUAL "2.9")
 endif(DEFINED DEFAULT_ALLOW_MILPS)
 MESSAGE("-- default_allow_milps: ${default_allow_milps}")
-CONFIGURE_FILE(
-    "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
-    @ONLY
-    )
 
 EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF_H" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF_H RESULT_VARIABLE res_var_h)
 IF(NOT "${res_var_h}" STREQUAL "0")
@@ -159,13 +154,6 @@ endif(Cython_FOUND)
 
 INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(CYCLUS_COIN_SRC
-    "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory.cc"
-    "${CMAKE_CURRENT_SOURCE_DIR}/OsiCbcSolverInterface.cpp"
-    )
 
 SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -175,30 +163,10 @@ FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
 foreach(ccfile ${CYCLUS_COIN_SRC})
   list(REMOVE_ITEM cc_files ${ccfile})
 endforeach()
-list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
-list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 
-# Add Cyclus source files that use COIN, if we have COIN
-if(COIN_FOUND)
-  SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${CYCLUS_COIN_SRC})
-endif()
 
-# Add bateman solver from PyNE
-#add_definitions(-DPYNE_IS_AMALGAMATED)
-download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
-                  ".cpp" ".s")
-fast_compile(decay.cpp "-O0" "-O0" "-O0")
-set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
-
-# Add CRAM solver from PyNE
-download_platform("http://raw.githubusercontent.com/pyne/data/master" "cram"
-                     ".c" ".s")
-fast_compile(cram.c
-  "-O0 -fcx-fortran-rules -fcx-limited-range -ftree-sra -ftree-ter -fexpensive-optimizations"
-  "-O0 -ffast-math"
-  "-O0")
 
 # write the include directories to a file for later use
 get_property(incdirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
@@ -210,7 +178,6 @@ SET(h_files ${h_files} ${hpp_files})
 
 INSTALL(FILES ${h_files} DESTINATION include/cyclus COMPONENT core)
 
-ADD_SUBDIRECTORY(toolkit)
 
 ADD_LIBRARY(cyclus ${CYCLUS_CORE_SRC})
 

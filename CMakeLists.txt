@@ -51,9 +51,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_CLI_DIR "${PROJECT_SOURCE_DIR}/cli")
     SET(CYCLUS_DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
     SET(CYCLUS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
-    SET(CYCLUS_STUB_DIR "${PROJECT_SOURCE_DIR}/stubs")
-    SET(CYCLUS_TEST_DIR "${PROJECT_SOURCE_DIR}/tests")
-    SET(CYCLUS_AGENTS_DIR "${PROJECT_SOURCE_DIR}/agents")
     SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
     SET(CYCLUS_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus")
 
@@ -134,12 +131,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(dynamicloadlib "unix_helper_functions.h")
     ENDIF()
 
-    # enable testing, must be at top-level cmake file
-    OPTION(USE_TESTING "Build testing" ON)
-    IF(USE_TESTING)
-        enable_testing()
-        INCLUDE(CTest)
-    ENDIF()
 
     ##############################################################################################
     ################################## end cmake configuration ###################################
@@ -392,11 +383,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
     MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")
 
-    ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     if(Cython_FOUND)
         ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
@@ -407,34 +394,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     ##############################################################################################
 
     ################# custom install files #######################################################
-    INSTALL(
-        FILES
-        stubs/CMakeLists.txt
-        stubs/example_facility.xml
-        stubs/example_inst.xml
-        stubs/example_region.xml
-        stubs/install.py
-        stubs/README.rst
-        DESTINATION share/cyclus/stubs
-        COMPONENT stubs
-        )
-
-    INSTALL(
-        FILES
-            stubs/src/CMakeLists.txt
-            stubs/src/stub_facility.h
-            stubs/src/stub_facility.cc
-            stubs/src/stub_facility_tests.cc
-            stubs/src/stub_inst.h
-            stubs/src/stub_inst.cc
-            stubs/src/stub_inst_tests.cc
-            stubs/src/stub_region.h
-            stubs/src/stub_region.cc
-            stubs/src/stub_region_tests.cc
-            stubs/src/stub_unit_test_driver.cc
-        DESTINATION share/cyclus/stubs/src
-        COMPONENT stubs
-        )
 
     if(Cython_FOUND)
         set(pyinstallscript "${CMAKE_CURRENT_BINARY_DIR}/cmake/SetupPyInstall.cmake")
@@ -467,7 +426,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cyclus : A nuclear fuel cycle simulator from UW-Madison.")
 
     # Here we set some components for installation with cpack
-    SET(CPACK_COMPONENTS_ALL cyclus testing libraries data core)
     SET(CPACK_GENERATOR "DEB")
 
     # Organisation
