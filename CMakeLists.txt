@@ -387,9 +387,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     # ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
-    if(Cython_FOUND)
-        ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
-    endif(Cython_FOUND)
+    #if(Cython_FOUND)
+    #    ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
+    #endif(Cython_FOUND)
 
     ##############################################################################################
     ####################################### end includes #########################################
