@@ -10,9 +10,9 @@ import json
 from functools import wraps
 from collections.abc import Set, Sequence
 
-from cyclus.system import asyncio
-from cyclus import lib
-from cyclus.jsoncpp import FastWriter
+from cyclus_backend.system import asyncio
+from cyclus_backend import lib
+from cyclus_backend.jsoncpp import FastWriter
 
 
 def action(f):

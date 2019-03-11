@@ -20,7 +20,7 @@ ENDIF()
 #
 # Build cython files
 #
-file(GLOB CYCLUS_CYTHON_FILES "${CYCLUS_PYSOURCE_DIR}/*.pyx")
+file(GLOB CYCLUS_CYTHON_FILES "${CYCLUS_BACK_PYSOURCE_DIR}/*.pyx")
 
 set_source_files_properties(${CYCLUS_CYTHON_FILES}
     PROPERTIES CYTHON_IS_CXX TRUE)

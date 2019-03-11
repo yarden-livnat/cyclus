@@ -935,10 +935,10 @@ TYPESYSTEM_PYX = JENV.from_string('''
 from cpython.pycapsule cimport PyCapsule_New, PyCapsule_GetPointer
 
 # local imports
-from cyclus cimport cpp_typesystem
-from cyclus cimport cpp_cyclus
-from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
-from cyclus cimport lib
+from cyclus_backend cimport cpp_typesystem
+from cyclus_backend cimport cpp_cyclus
+from cyclus_backend.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
+from cyclus_backend cimport lib
 
 
 # pure python imports
@@ -946,7 +946,7 @@ import uuid
 import collections
 from binascii import hexlify
 
-from cyclus import nucname
+from cyclus_backend import nucname
 #
 # Resources & Inventories
 #
@@ -2538,9 +2538,9 @@ TYPESYSTEM_PXD = JENV.from_string('''
 {{ stl_cimports }}
 
 # local imports
-from cyclus cimport cpp_typesystem
-from cyclus cimport cpp_cyclus
-from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
+from cyclus_backend cimport cpp_typesystem
+from cyclus_backend cimport cpp_cyclus
+from cyclus_backend.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast
 
 #
 # Resources & Inventories

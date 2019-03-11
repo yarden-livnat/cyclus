@@ -75,3 +75,5 @@ cyclus/cycpp.py
 
 # Rever
 rever/
+cyclus_backend/typesystem.pxd
+cyclus_backend/typesystem.pyx
