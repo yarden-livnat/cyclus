@@ -52,7 +52,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_DOC_DIR "${PROJECT_SOURCE_DIR}/doc")
     SET(CYCLUS_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
     SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
-    SET(CYCLUS_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus")
+    SET(CYCLUS_BACK_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus_backend")
 
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
@@ -387,9 +387,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     # ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
-    #if(Cython_FOUND)
-    #    ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
-    #endif(Cython_FOUND)
+    if(Cython_FOUND)
+        ADD_SUBDIRECTORY("${CYCLUS_BACK_PYSOURCE_DIR}")
+    endif(Cython_FOUND)
 
     ##############################################################################################
     ####################################### end includes #########################################

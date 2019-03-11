@@ -5,7 +5,7 @@ import sys
 from distutils.core import setup
 from pprint import pprint
 
-PROJECT = 'cyclus'
+PROJECT = 'cyclus_backend'
 
 #
 # Version updates borrowed from xonsh
@@ -58,9 +58,9 @@ def run_setup(ver):
         classifiers=['Operating System :: POSIX',
                      'Programming Language :: Python :: 3',
                      'Programming Language :: Python :: 2'],
-        packages=['cyclus'],
-        package_dir={'cyclus': 'cyclus'},
-        package_data={'cyclus': ['*.pxd', '*.so', '*.dylib']},
+        packages=['cyclus_backend'],
+        package_dir={'cyclus_backend': 'cyclus_backend'},
+        package_data={'cyclus_backend': ['*.pxd', '*.so', '*.dylib']},
         scripts=scripts,
         zip_safe=False,
         )
