@@ -12,7 +12,6 @@ from libcpp.typeinfo cimport type_info
 # we use boost shared_ptrs
 #from libcpp.memory cimport shared_ptr
 
-from . cimport cpp_jsoncpp
 from .cpp_typesystem cimport DbTypes
 
 

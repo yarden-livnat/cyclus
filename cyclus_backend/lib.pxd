@@ -12,9 +12,7 @@ from libcpp cimport bool as cpp_bool
 from cpython cimport PyObject
 
 # local imports
-from cyclus_backend cimport cpp_jsoncpp
-from cyclus_backend cimport cpp_cyclus
-from cyclus_backend.cpp_stringstream cimport stringstream
+from cyclus_backend cimport cpp_cyclus_backend
 
 
 cdef class _Datum:
@@ -22,8 +20,8 @@ cdef class _Datum:
     cdef bint _free
     cdef list _fieldnames
 
-cdef object query_result_to_py(cpp_cyclus.QueryResult)
-cdef object single_query_result_to_py(cpp_cyclus.QueryResult qr, int row)
+cdef object query_result_to_py(cpp_cyclus_backend.QueryResult)
+cdef object single_query_result_to_py(cpp_cyclus_backend.QueryResult qr, int row)
 
 cdef class _FullBackend:
     cdef void * ptx
@@ -43,7 +41,7 @@ cdef class _Logger:
     pass
 
 cdef class _ColumnInfo:
-    cdef cpp_cyclus.ColumnInfo * ptx
-    cdef void copy_from(_ColumnInfo, cpp_cyclus.ColumnInfo)
+    cdef cpp_cyclus_backend.ColumnInfo * ptx
+    cdef void copy_from(_ColumnInfo, cpp_cyclus_backend.ColumnInfo)
 
 

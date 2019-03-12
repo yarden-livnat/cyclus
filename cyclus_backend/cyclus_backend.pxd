@@ -11,7 +11,7 @@ from libc.stdlib cimport malloc, free
 from libcpp cimport bool as cpp_bool
 
 # local imports
-from cyclus_backend cimport cpp_cyclus
+from cyclus_backend cimport cpp_cyclus_backend
 
 
 cdef class _Datum:
