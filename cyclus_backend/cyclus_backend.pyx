@@ -21,9 +21,9 @@ import numpy as np
 import pandas as pd
 
 # local imports
-from cymetric cimport cpp_cyclus
-from cymetric cimport cpp_typesystem
-from cymetric.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
+from cyclus_backend cimport cpp_cyclus
+from cyclus_backend cimport cpp_typesystem
+from cyclus_backend.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp
 
 

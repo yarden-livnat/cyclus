@@ -8,6 +8,11 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 # First things first, code-generation
 #
 message(STATUS "Generating Type System API for Python")
+message("COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
+    --src-dir=${CMAKE_CURRENT_SOURCE_DIR}
+    --cyclus-version=${core_version}
+    --verbose
+    RESULT_VARIABLE res_var")
 EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
     "--src-dir=${CMAKE_CURRENT_SOURCE_DIR}"
     "--cyclus-version=${core_version}"
@@ -28,7 +33,7 @@ set_source_files_properties(${CYCLUS_CYTHON_FILES}
 # Print include dir
 get_property(inc_dirs DIRECTORY PROPERTY INCLUDE_DIRECTORIES)
 message("-- Include paths for ${CMAKE_CURRENT_SOURCE_DIR}: ${inc_dirs}")
-
+message("CYCLUS_CYTHON_FILES ${CYCLUS_CYTHON_FILES}")
 foreach(file ${CYCLUS_CYTHON_FILES})
     get_filename_component(name ${file} NAME_WE)
     set(targ "py_${name}_")
