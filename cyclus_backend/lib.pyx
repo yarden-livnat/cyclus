@@ -35,7 +35,7 @@ from cyclus_backend cimport cpp_cyclus_backend
 from cyclus_backend.cpp_cyclus_backend cimport shared_ptr
 from cyclus_backend cimport cpp_typesystem
 from cyclus_backend cimport typesystem as ts
-from cyclus_backend import typesystem as ts
+#from cyclus_backend import typesystem as ts
 from cyclus_backend.typesystem cimport py_to_any, db_to_py, uuid_cpp_to_py, \
     str_py_to_cpp, std_string_to_py, std_vector_std_string_to_py, \
     bool_to_py, bool_to_cpp, int_to_py, std_set_std_string_to_py, uuid_cpp_to_py, \
