@@ -212,6 +212,21 @@ INSTALL(FILES ${h_files} DESTINATION include/cyclus COMPONENT core)
 
 ADD_SUBDIRECTORY(toolkit)
 
+ADD_LIBRARY(cyclus_backend ${CYCLUS_CORE_SRC})
+SET_TARGET_PROPERTIES(cyclus_backend
+    PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+    )
+TARGET_LINK_LIBRARIES(cyclus_backend dl ${LIBS})
+
+INSTALL(
+    TARGETS cyclus_backend
+    LIBRARY DESTINATION lib
+    COMPONENT cyclus
+    )
+
+
 ADD_LIBRARY(cyclus ${CYCLUS_CORE_SRC})
 
 SET_TARGET_PROPERTIES(cyclus
@@ -220,7 +235,7 @@ SET_TARGET_PROPERTIES(cyclus
     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
     )
 
-TARGET_LINK_LIBRARIES(cyclus dl ${LIBS})
+TARGET_LINK_LIBRARIES(cyclus dl ${LIBS} cyclus_backend)
 
 INSTALL(
     TARGETS cyclus
