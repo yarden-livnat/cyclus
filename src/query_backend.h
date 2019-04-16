@@ -6,7 +6,13 @@
 #include <map>
 #include <set>
 
-#include <boost/uuid/sha1.hpp>
+#include <boost/version.hpp>
+
+#if BOOST_VERSION / 100 % 1000 <= 67
+  #include <boost/uuid/sha1.hpp>
+#else
+  #include <boost/uuid/detail/sha1.hpp>
+#endif
 
 #include "blob.h"
 #include "rec_backend.h"
